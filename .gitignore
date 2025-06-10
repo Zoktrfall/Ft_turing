@@ -1,0 +1,11 @@
+ft_turing
+*.o
+*.byt
+*.pyc
+*.opt
+*.cmo
+*.cmi
+*.cmx
+.#*
+*.dump
+a.out
