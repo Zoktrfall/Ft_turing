@@ -122,3 +122,59 @@ let run ~(machine:Machine.t) ~(input:string) ?(max_steps=1_000_000) ()
   in
   let cfg0 = init ~machine ~input in
   loop cfg0
+
+
+(* Bonus part *)
+type stats = {
+  steps   : int;
+  min_pos : int;
+  max_pos : int;
+  space   : int;
+}
+
+let run_with_stats
+    ?(max_steps=1_000_000)
+    ?(trace=true)
+    ~(machine:Machine.t)
+    ~(input:string)
+    ()
+  : (halt_reason * stats) =
+  let rec loop (cfg:config) (head_pos:int) (min_pos:int) (max_pos:int) =
+    if cfg.steps >= max_steps then
+      (Step_limit_reached max_steps,
+       { steps = cfg.steps; min_pos; max_pos; space = (max_pos - min_pos + 1) })
+    else
+      match Machine.StringMap.find_opt cfg.state machine.delta with
+      | None ->
+          (Blocked_no_state cfg.state,
+           { steps = cfg.steps; min_pos; max_pos; space = (max_pos - min_pos + 1) })
+      | Some cmap ->
+          let sym = cfg.tape.head in
+          match Machine.CharMap.find_opt sym cmap with
+          | None ->
+              (Blocked_no_rule (cfg.state, sym),
+               { steps = cfg.steps; min_pos; max_pos; space = (max_pos - min_pos + 1) })
+          | Some tr ->
+              if trace then
+                Machine_printer.print_transition_line
+                  ~blank:machine.blank
+                  ~left:cfg.tape.left ~head:cfg.tape.head ~right:cfg.tape.right
+                  ~state:cfg.state ~tr;
+              let steps' = cfg.steps + 1 in
+              if List.exists (String.equal tr.to_state) machine.finals then
+                (Final_state tr.to_state,
+                 { steps = steps'; min_pos; max_pos; space = (max_pos - min_pos + 1) })
+              else
+                let tape' = write tr.write cfg.tape in
+                let tape'', head_pos' =
+                  match tr.action with
+                  | Left  -> (move_left  ~blank:machine.blank tape', head_pos - 1)
+                  | Right -> (move_right ~blank:machine.blank tape', head_pos + 1)
+                in
+                let min_pos' = if head_pos' < min_pos then head_pos' else min_pos in
+                let max_pos' = if head_pos' > max_pos then head_pos' else max_pos in
+                let cfg' = { state = tr.to_state; tape = tape''; steps = steps' } in
+                loop cfg' head_pos' min_pos' max_pos'
+  in
+  let cfg0 = init ~machine ~input in
+  loop cfg0 0 0 0

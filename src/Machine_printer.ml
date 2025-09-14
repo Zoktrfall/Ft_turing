@@ -1,10 +1,12 @@
 let print_help () =
-  print_endline "usage: ft_turing [-h] jsonfile input";
+  print_endline "usage: ft_turing [-h] [--stats [--no-trace]] jsonfile input";
   print_endline "positional arguments:";
   print_endline "  jsonfile   json description of the machine";
   print_endline "  input      input of the machine";
   print_endline "optional arguments:";
-  print_endline "  -h, --help show this help message and exit"
+  print_endline "  -h, --help   show this help message and exit";
+  print_endline "  --stats      print time/space complexity stats after execution";
+  print_endline "  --no-trace   only valid together with --stats; suppresses per-step trace"
 
 let print_usage () =
   print_endline "usage: ft_turing [-h] jsonfile input"
@@ -108,3 +110,13 @@ let print_machine_info (m : Machine.t) =
   print_transitions m;
 
   Printf.printf "%s\n%!" star_line
+
+(* Bonus *)
+let print_stats ~input ~steps ~space ~min_pos ~max_pos =
+  let n = String.length input in
+  Printf.printf "----- stats -----\n";
+  Printf.printf "input length (n) : %d\n" n;
+  Printf.printf "steps            : %d\n" steps;
+  Printf.printf "space (cells)    : %d\n" space;
+  Printf.printf "min_pos          : %d\n" min_pos;
+  Printf.printf "max_pos          : %d\n%!" max_pos

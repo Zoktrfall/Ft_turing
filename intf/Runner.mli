@@ -21,3 +21,19 @@ val init : machine:Machine.t -> input:string -> config
 val step : machine:Machine.t -> config -> (config, halt_reason) result
 
 val run : ?max_steps:int -> machine:Machine.t -> input:string -> (config, halt_reason) result
+
+(* We Seperate the Bonus part *)
+type stats = {
+  steps     : int;
+  min_pos   : int;
+  max_pos   : int;
+  space     : int;
+}
+
+val run_with_stats :
+  ?max_steps:int ->
+  ?trace:bool ->
+  machine:Machine.t ->
+  input:string ->
+  unit ->
+  (halt_reason * stats)
