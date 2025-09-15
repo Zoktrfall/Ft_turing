@@ -35,15 +35,6 @@ module J = struct
     | _ -> Error [FieldType (field, "list")]
 end
 
-let collect = function
-  | [] -> Ok ()
-  | xs ->
-      let rec loop acc = function
-        | [] -> if acc = [] then Ok () else Error (List.rev acc)
-        | Ok () :: tl -> loop acc tl
-        | Error e :: tl -> loop (e @ acc) tl
-      in
-      loop [] xs
 
 let ensure_unique ~eq ~on_dup lst =
   let rec go seen = function

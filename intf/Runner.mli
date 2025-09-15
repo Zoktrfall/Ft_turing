@@ -18,9 +18,8 @@ type halt_reason =
 
 val init : machine:Machine.t -> input:string -> config
 
-val step : machine:Machine.t -> config -> (config, halt_reason) result
-
 val run : ?max_steps:int -> machine:Machine.t -> input:string -> (config, halt_reason) result
+
 
 (* We Seperate the Bonus part *)
 type stats = {

@@ -55,7 +55,6 @@ let print_transition_line ~blank ~left ~head ~right ~state ~tr =
     (Machine.string_of_action tr.Machine.action)
 
 
-
 let star_line = String.make 80 '*'
 
 let center_in_76 s =
