@@ -26,22 +26,65 @@ let print_blocked_no_rule st c =
 let print_step_limit n =
   Printf.printf "STOP: step limit (%d) reached\n%!" n
 
+
+let _fixed_inner_width : int option ref = ref None
+let reset_render_width () = _fixed_inner_width := None
+
+let rec first_n n xs =
+  match n, xs with
+  | 0, _ | _, [] -> []
+  | n, x :: tl -> x :: first_n (n - 1) tl
+
+let drop n xs =
+  let rec go k ys =
+    match k, ys with
+    | 0, _ | _, [] -> ys
+    | k, _ :: tl -> go (k - 1) tl
+  in
+  go n xs
+
+let last_n n xs =
+  let len = List.length xs in
+  if len <= n then xs else drop (len - n) xs
+
 let render_tape ~blank ~left ~head ~right =
   let pad_right = 13 in
-  let buf = Buffer.create 64 in
+
+  let curr_inner_len =
+    List.length left + 3 + List.length right + pad_right
+  in
+  let target_inner_len =
+    match !_fixed_inner_width with
+    | Some w -> w
+    | None ->
+        _fixed_inner_width := Some curr_inner_len;
+        curr_inner_len
+  in
+
+  let space_for_lr = max 0 (target_inner_len - pad_right - 3) in
+  let take_left = min (List.length left) space_for_lr in
+  let left_slice = last_n take_left left in
+  let space_left_for_right = space_for_lr - List.length left_slice in
+  let right_slice = first_n (max 0 space_left_for_right) right in
+
+  let buf = Buffer.create (target_inner_len + 2) in
   Buffer.add_char buf '[';
 
-  let rec add_left = function
+  let rec add_left_rev_to_buf = function
     | [] -> ()
-    | x :: xs -> add_left xs; Buffer.add_char buf x
+    | x :: xs -> add_left_rev_to_buf xs; Buffer.add_char buf x
   in
-  add_left left;
+  add_left_rev_to_buf left_slice;
 
-  Buffer.add_char buf '<'; Buffer.add_char buf head; Buffer.add_char buf '>';
+  Buffer.add_char buf '<';
+  Buffer.add_char buf head;
+  Buffer.add_char buf '>';
 
-  List.iter (Buffer.add_char buf) right;
+  List.iter (Buffer.add_char buf) right_slice;
 
-  for _i = 1 to pad_right do Buffer.add_char buf blank done;
+  let already = List.length left_slice + 3 + List.length right_slice in
+  let need_blanks = max 0 (target_inner_len - already) in
+  for _ = 1 to need_blanks do Buffer.add_char buf blank done;
 
   Buffer.add_char buf ']';
   Buffer.contents buf
@@ -54,7 +97,7 @@ let print_transition_line ~blank ~left ~head ~right ~state ~tr =
     tr.Machine.write
     (Machine.string_of_action tr.Machine.action)
 
-
+    
 let star_line = String.make 80 '*'
 
 let center_in_76 s =
@@ -109,13 +152,3 @@ let print_machine_info (m : Machine.t) =
   print_transitions m;
 
   Printf.printf "%s\n%!" star_line
-
-(* Bonus *)
-let print_stats ~input ~steps ~space ~min_pos ~max_pos =
-  let n = String.length input in
-  Printf.printf "----- stats -----\n";
-  Printf.printf "input length (n) : %d\n" n;
-  Printf.printf "steps            : %d\n" steps;
-  Printf.printf "space (cells)    : %d\n" space;
-  Printf.printf "min_pos          : %d\n" min_pos;
-  Printf.printf "max_pos          : %d\n%!" max_pos

@@ -5,8 +5,8 @@ OBJ_DIR = obj
 SWITCH_NAME=ft_turing_env
 OCAML_VERSION=5.2.1
 
-SRCS = Machine_error.ml Machine.ml Machine_loader.ml Machine_printer.ml Runner.ml Main.ml
-INTFS = Machine_error.mli Machine.mli Machine_loader.mli Machine_printer.mli Runner.mli
+SRCS = Machine_error.ml Machine_validator.ml Machine.ml Machine_loader.ml Machine_printer.ml Runner.ml Main.ml
+INTFS = Machine_error.mli Machine_validator.mli Machine.mli Machine_loader.mli Machine_printer.mli Runner.mli
 
 ML_FILES = $(addprefix $(SRC_DIR)/, $(SRCS))
 MLI_FILES = $(addprefix $(INTF_DIR)/, $(INTFS))

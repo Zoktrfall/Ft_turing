@@ -16,7 +16,7 @@ type t =
   | TransitionDuplicateRead of string * char
 
 let to_string = function
-  | Json msg -> "json error: " ^ msg
+  | Json msg -> "validation error: " ^ msg
   | FieldMissing f -> "missing field: " ^ f
   | FieldType (f, exp) -> "field type error: " ^ f ^ " (expected " ^ exp ^ ")"
   | AlphabetSymbolLen s -> "alphabet entries must be length 1, got: " ^ s

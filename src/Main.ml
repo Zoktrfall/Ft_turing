@@ -19,7 +19,7 @@ let () =
            | Ok () ->
                Machine_printer.print_machine_info machine;
 
-               let max_steps = 1_000_000 in
+               let max_steps = 100 in
                let trace = not no_trace in
 
                let print_reason = function
@@ -34,12 +34,7 @@ let () =
                    Runner.run_with_stats ~max_steps ~trace ~machine ~input ()
                  in
                  print_reason reason;
-                 Machine_printer.print_stats
-                   ~input
-                   ~steps:st.steps
-                   ~space:st.space
-                   ~min_pos:st.min_pos
-                   ~max_pos:st.max_pos
+                 Runner.print_stats st
                end else begin
                  match Runner.run ~max_steps ~machine ~input () with
                  | Ok _ -> ()

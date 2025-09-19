@@ -31,32 +31,28 @@ type t = {
 
 let validate_input (m : t) (s : string) =
   let module CSet = Set.Make (Char) in
-  let alpha =
-    m.alphabet |> List.to_seq |> CSet.of_seq
-  in
-  
+  let alpha = m.alphabet |> List.to_seq |> CSet.of_seq in
+
   let rec loop i acc =
     if i = String.length s then acc
     else
       let c = s.[i] in
       let acc =
         if not (CSet.mem c alpha) then
-          (Printf.sprintf
-             "input contains symbol not in alphabet: '%c' at index %d"
-             c i) :: acc
+          Printf.sprintf
+            "input contains symbol not in alphabet: '%c' at index %d" c i :: acc
         else acc
       in
       let acc =
         if Char.equal c m.blank then
-          (Printf.sprintf
-             "input must not contain the blank symbol '%c' (at index %d)"
-             m.blank i) :: acc
+          Printf.sprintf
+            "input must not contain the blank symbol '%c' (at index %d)" m.blank i
+          :: acc
         else acc
       in
       loop (i + 1) acc
   in
-
   let errs = loop 0 [] |> List.rev in
   match errs with
-    | [] -> Ok ()
-    | es -> Error es
+  | [] -> Machine_validator.validate_for_machine ~machine_name:m.name ~input:s
+  | es -> Error es

@@ -26,12 +26,3 @@ val print_transition_line :
   state:string ->
   tr:Machine.transition ->
   unit
-
-(* Only used for bonus part *)
-val print_stats :
-  input:string ->
-  steps:int ->
-  space:int ->
-  min_pos:int ->
-  max_pos:int ->
-  unit
