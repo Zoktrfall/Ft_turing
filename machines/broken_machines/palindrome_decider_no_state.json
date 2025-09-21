@@ -1,0 +1,26 @@
+{
+  "name": "palindrome_decider",
+  "alphabet": ["0", "1", "x", "y", "n", "."],
+  "blank": ".",
+  "states": [
+    "start", "find_right_0", "find_right_1",
+    "compare_0", "compare_1",
+    "rewind_left", "goto_end_write_n"
+  ],
+  "initial": "start",
+  "finals": [],
+  "transitions": {
+    "start": [
+      { "read": "x", "to_state": "start", "write": "x", "action": "RIGHT" },
+      { "read": "0", "to_state": "find_right_0", "write": "x", "action": "RIGHT" },
+      { "read": "1", "to_state": "find_right_1", "write": "x", "action": "RIGHT" },
+      { "read": ".", "to_state": "goto_end_write_n", "write": "y", "action": "RIGHT" }
+    ],
+    "goto_end_write_n": [
+      { "read": ".", "to_state": "goto_end_write_n", "write": ".", "action": "RIGHT" },
+      { "read": "0", "to_state": "goto_end_write_n", "write": "0", "action": "RIGHT" },
+      { "read": "1", "to_state": "goto_end_write_n", "write": "1", "action": "RIGHT" },
+      { "read": "x", "to_state": "goto_end_write_n", "write": "x", "action": "RIGHT" }
+    ]
+  }
+}

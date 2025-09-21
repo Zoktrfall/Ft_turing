@@ -24,8 +24,7 @@ let print_blocked_no_rule st c =
   Printf.printf "BLOCKED: no rule for (state=%s, read='%c')\n%!" st c
 
 let print_step_limit n =
-  Printf.printf "STOP: step limit (%d) reached\n%!" n
-
+  Printf.printf "STOP: step limit (%d) reached — machine likely stuck due to invalid JSON description.\n%!" n
 
 let _fixed_inner_width : int option ref = ref None
 let reset_render_width () = _fixed_inner_width := None

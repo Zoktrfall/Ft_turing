@@ -157,8 +157,25 @@ let theory_for (machine_name : string) ~(input:string) : string option * string 
       in
       let s_note = "space Θ(n) (linear in input length)" in
       (Some t_note, Some s_note)
+
   | "unary_add" ->
       (Some "time Θ(n) (single pass to '=' and combine)", Some "space Θ(n)")
+  
+  | "palindrome_decider" ->
+      let n =
+        match String.index_opt input '.' with
+        | Some i -> i
+        | None -> String.length input
+      in
+      let t_note =
+        "time Θ(n²) worst-case, Θ(n) best-case (scans tape each round until mismatch or finish)"
+      in
+      let s_note =
+        Printf.sprintf
+          "space Θ(n) (in-place marking + 1 output symbol; input length ≈ %d)" n
+      in
+      (Some t_note, Some s_note)
+  
   | _ -> (None, None)
 
 

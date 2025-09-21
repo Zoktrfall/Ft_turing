@@ -35,8 +35,21 @@ let validate_unary_add s =
              else Ok ()
          | _ -> err "expected exactly one '+' separator")
 
+let validate_palindrome s =
+  if String.length s = 0 then err "empty input"
+  else
+    let invalid_char =
+      String.to_seq s
+      |> Seq.find (fun c -> c <> '0' && c <> '1')
+    in
+    match invalid_char with
+    | Some c ->
+        err (Printf.sprintf "invalid character '%c' in input (only '0' and '1' allowed)" c)
+    | None -> Ok ()
+
 let validate_for_machine ~machine_name ~input =
   match String.lowercase_ascii machine_name with
   | "unary_sub" -> validate_unary_sub input
   | "unary_add" -> validate_unary_add input
+  | "palindrome_decider" -> validate_palindrome input
   | _ -> Ok ()

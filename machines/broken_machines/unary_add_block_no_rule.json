@@ -1,0 +1,14 @@
+{
+  "name": "unary_add",
+  "alphabet": ["1", "+", "=", "."],
+  "blank": ".",
+  "states": ["scanplus"],
+  "initial": "scanplus",
+  "finals": [],
+  "transitions": {
+    "scanplus": [
+      { "read": ".", "to_state": "scanplus", "write": ".", "action": "RIGHT" },
+      { "read": "1", "to_state": "scanplus", "write": "1", "action": "RIGHT" }
+    ]
+  }
+}

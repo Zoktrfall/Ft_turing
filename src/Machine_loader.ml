@@ -63,6 +63,14 @@ let load ~json_path =
   let* finals_v = J.find "finals" root in
   let* transitions_v = J.find "transitions" root in
 
+  (* For names, I actually added some validation, but I’m not sure whether I should allow other names.
+   For now, any names are allowed, but we have predefined ones for stricter validation:
+    unary_sub, 
+    unary_add, 
+    palindrome_decider, 
+    zero_2n, 
+    zero_n_one_n, 
+    meta_run_unary_add. *)
   let* name = J.as_string "name" name_v in
 
   let* alphabet_list = J.as_list "alphabet" alphabet_v in
