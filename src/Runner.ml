@@ -99,7 +99,7 @@ type stats = {
 let print_stats (st : stats) =
   let open Printf in
   printf "----- stats -----\n";
-  printf "input length (n) : %d\n" (st.n - 1);
+  printf "input length (n) : %d\n" (st.n);
   printf "steps            : %d\n" st.steps;
   printf "space (cells)    : %d\n" st.space;
   printf "min_pos          : %d\n" st.min_pos;
@@ -175,6 +175,21 @@ let theory_for (machine_name : string) ~(input:string) : string option * string 
           "space Θ(n) (in-place marking + 1 output symbol; input length ≈ %d)" n
       in
       (Some t_note, Some s_note)
+
+  | "zero_n_one_n" ->
+    let t_note = "time Θ(n²) worst-case, Θ(n) best-case (pair-and-rewind rounds)" in
+    let s_note = "space Θ(n) (in-place marks + one output symbol)" in
+    (Some t_note, Some s_note)
+
+  | "zero_2n" ->
+    let len = String.length input in
+    let t_note = "time Θ(n) (single left-to-right scan with parity tracking)" in
+    let s_note = Printf.sprintf "space Θ(n) (input length = %d, no additional tape cells used)" len in
+    (Some t_note, Some s_note)
+
+  | "meta_run_unary_add" ->
+    (Some "time ≈ time(unary_add) (decoder O(1) + addition)",
+     Some "space ≈ space(unary_add)")
   
   | _ -> (None, None)
 

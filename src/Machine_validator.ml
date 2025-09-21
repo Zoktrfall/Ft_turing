@@ -35,21 +35,38 @@ let validate_unary_add s =
              else Ok ()
          | _ -> err "expected exactly one '+' separator")
 
-let validate_palindrome s =
+let validate_binary_input s =
   if String.length s = 0 then err "empty input"
   else
-    let invalid_char =
-      String.to_seq s
-      |> Seq.find (fun c -> c <> '0' && c <> '1')
+    let bad =
+      String.to_seq s |> Seq.find (fun c -> c <> '0' && c <> '1')
     in
-    match invalid_char with
-    | Some c ->
-        err (Printf.sprintf "invalid character '%c' in input (only '0' and '1' allowed)" c)
+    match bad with
+    | Some c -> Error [Printf.sprintf "invalid character '%c' (only '0' and '1' allowed)" c]
     | None -> Ok ()
+
+let validate_zero_2n s =
+  if String.length s = 0 then
+    err "input must not be empty"
+  else
+    match String.to_seq s |> Seq.find (fun c -> c <> '0') with
+    | Some c -> err (Printf.sprintf "invalid character '%c' (only '0' allowed)" c)
+    | None -> Ok ()
+
+
+let validate_meta_unary_add s =
+  if String.length s < 2 || s.[0] <> 'A' || s.[1] <> ':' then
+    Error ["input must start with \"A:\""]
+  else
+    let payload = String.sub s 2 (String.length s - 2) in
+    validate_unary_add payload
 
 let validate_for_machine ~machine_name ~input =
   match String.lowercase_ascii machine_name with
   | "unary_sub" -> validate_unary_sub input
   | "unary_add" -> validate_unary_add input
-  | "palindrome_decider" -> validate_palindrome input
+  | "palindrome_decider" -> validate_binary_input input
+  | "zero_n_one_n" -> validate_binary_input input
+  | "zero_2n" -> validate_zero_2n input
+  | "meta_run_unary_add" -> validate_meta_unary_add input
   | _ -> Ok ()
