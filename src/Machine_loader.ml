@@ -148,53 +148,84 @@ let load ~json_path =
                 : (Machine.transition CM.t, Machine_error.t list) result =
                 match js with
                 | `Assoc kvs ->
-                    let get k =
-                      match List.assoc_opt k kvs with
-                      | Some x -> Ok x
-                      | None ->
-                          Error [TransitionMalformed ("state " ^ st ^ " (missing " ^ k ^ ")")]
-                    in
-                    let* read_js    = get "read" in
-                    let* to_state_js= get "to_state" in
-                    let* write_js   = get "write" in
-                    let* action_js  = get "action" in
+                  let allowed = [ "read"; "to_state"; "write"; "action" ] in
+                  let keys = List.map fst kvs in
 
-                    let* read_s  = J.as_string "read" read_js in
-                    let* write_s = J.as_string "write" write_js in
+                  let unknown =
+                    List.filter (fun k -> not (List.mem k allowed)) keys
+                  in
+                  let* () =
+                    if unknown = [] then Ok ()
+                    else
+                      Error [TransitionMalformed
+                              ("state " ^ st ^ " (unknown fields: "
+                                ^ String.concat ", " unknown ^ ")")]
+                  in
 
-                    let* read_c =
-                      match char_of_len1 read_s with
-                      | Ok c when CSet.mem c alpha_set -> Ok c
-                      | Ok c -> Error [TransitionSymbolNotInAlphabet (c, "state " ^ st)]
-                      | Error e -> Error e
+                  let dupes =
+                    let sorted = List.sort String.compare keys in
+                    let rec go acc = function
+                      | a :: b :: t when String.equal a b -> go (a :: acc) (b :: t)
+                      | _ :: t -> go acc t
+                      | [] -> List.rev acc
                     in
-                    let* write_c =
-                      match char_of_len1 write_s with
-                      | Ok c when CSet.mem c alpha_set -> Ok c
-                      | Ok c -> Error [TransitionSymbolNotInAlphabet (c, "state " ^ st)]
-                      | Error e -> Error e
-                    in
-                    let* to_state =
-                      match to_state_js with
-                      | `String s ->
-                          if List.exists (String.equal s) states then Ok s
-                          else Error [TransitionToStateUnknown s]
-                      | _ -> Error [FieldType ("to_state", "string")]
-                    in
-                    let* action =
-                      match action_js with
-                      | `String s ->
-                          (match Machine.action_of_string s with
-                          | Ok a -> Ok a
-                          | Error _ -> Error [TransitionActionInvalid s])
-                      | _ -> Error [FieldType ("action", "string")]
-                    in
+                    go [] sorted
+                  in
+                  let* () =
+                    if dupes = [] then Ok ()
+                    else
+                      Error [TransitionMalformed
+                              ("state " ^ st ^ " (duplicate fields: "
+                                ^ String.concat ", " dupes ^ ")")]
+                  in
 
-                    let tr = Machine.{ read = read_c; write = write_c; to_state; action } in
-                    if CM.mem read_c cmap
-                    then Error [TransitionDuplicateRead (st, read_c)]
-                    else Ok (CM.add read_c tr cmap)
+                  let get k =
+                    match List.assoc_opt k kvs with
+                    | Some x -> Ok x
+                    | None ->
+                        Error [TransitionMalformed ("state " ^ st ^ " (missing " ^ k ^ ")")]
+                  in
 
+                  let* read_js     = get "read" in
+                  let* to_state_js = get "to_state" in
+                  let* write_js    = get "write" in
+                  let* action_js   = get "action" in
+
+                  let* read_s  = J.as_string "read" read_js in
+                  let* write_s = J.as_string "write" write_js in
+
+                  let* read_c =
+                    match char_of_len1 read_s with
+                    | Ok c when CSet.mem c alpha_set -> Ok c
+                    | Ok c -> Error [TransitionSymbolNotInAlphabet (c, "state " ^ st)]
+                    | Error e -> Error e
+                  in
+                  let* write_c =
+                    match char_of_len1 write_s with
+                    | Ok c when CSet.mem c alpha_set -> Ok c
+                    | Ok c -> Error [TransitionSymbolNotInAlphabet (c, "state " ^ st)]
+                    | Error e -> Error e
+                  in
+                  let* to_state =
+                    match to_state_js with
+                    | `String s ->
+                        if List.exists (String.equal s) states then Ok s
+                        else Error [TransitionToStateUnknown s]
+                    | _ -> Error [FieldType ("to_state", "string")]
+                  in
+                  let* action =
+                    match action_js with
+                    | `String s ->
+                        (match Machine.action_of_string s with
+                        | Ok a -> Ok a
+                        | Error _ -> Error [TransitionActionInvalid s])
+                    | _ -> Error [FieldType ("action", "string")]
+                  in
+
+                  let tr = Machine.{ read = read_c; write = write_c; to_state; action } in
+                  if CM.mem read_c cmap
+                  then Error [TransitionDuplicateRead (st, read_c)]
+                  else Ok (CM.add read_c tr cmap)
                 | _ ->
                     Error [TransitionMalformed ("state " ^ st ^ " (entry " ^ string_of_int idx ^ ")")]
               in
