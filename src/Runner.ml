@@ -159,7 +159,27 @@ let theory_for (machine_name : string) ~(input:string) : string option * string 
       (Some t_note, Some s_note)
 
   | "unary_add" ->
-      (Some "time Θ(n) (single pass to '=' and combine)", Some "space Θ(n)")
+    let l, r =
+      match String.split_on_char '=' input with
+      | body :: _ -> (
+          match String.split_on_char '+' body with
+          | [lhs; rhs] ->
+              let count_ones s =
+                let c = ref 0 in
+                String.iter (fun ch -> if ch = '1' then incr c) s;
+                !c
+              in
+              (count_ones lhs, count_ones rhs)
+          | _ -> (0, 0))
+      | _ -> (0, 0)
+    in
+    let t_note =
+      Printf.sprintf
+        "time Θ((A+B)·B); here A=%d, B=%d → Θ(%d·%d) ≈ Θ(%d). worst-case Θ(n²), best-case Θ(n)"
+        l r (l + r) r ((l + r) * r)
+    in
+    let s_note = "space Θ(n) (linear in input length)" in
+    (Some t_note, Some s_note)
   
   | "palindrome_decider" ->
       let n =
