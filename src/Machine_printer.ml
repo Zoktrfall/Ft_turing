@@ -27,7 +27,6 @@ let print_step_limit n =
   Printf.printf "STOP: step limit (%d) reached — machine likely stuck due to invalid JSON description.\n%!" n
 
 let _fixed_inner_width : int option ref = ref None
-let reset_render_width () = _fixed_inner_width := None
 
 let rec first_n n xs =
   match n, xs with
@@ -95,7 +94,6 @@ let print_transition_line ~blank ~left ~head ~right ~state ~tr =
     tr.Machine.to_state
     tr.Machine.write
     (Machine.string_of_action tr.Machine.action)
-
     
 let star_line = String.make 80 '*'
 
