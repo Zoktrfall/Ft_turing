@@ -54,5 +54,5 @@ let validate_input (m : t) (s : string) =
   in
   let errs = loop 0 [] |> List.rev in
   match errs with
-  | [] -> Machine_validator.validate_for_machine ~machine_name:m.name ~input:s
-  | es -> Error es
+    | [] -> Machine_validator.validate_for_machine ~machine_name:m.name ~input:s
+    | es -> Error es

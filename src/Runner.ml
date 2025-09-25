@@ -1,12 +1,12 @@
 type tape = {
-  left  : char list;
-  head  : char;
+  left : char list;
+  head : char;
   right : char list;
 }
 
 type config = {
   state : string;
-  tape  : tape;
+  tape : tape;
   steps : int;
 }
 
@@ -19,12 +19,12 @@ type halt_reason =
 let move_left ~(blank:char) (t : tape) : tape =
   match t.left with
   | x :: xs -> { left = xs; head = x; right = t.head :: t.right }
-  | []      -> { left = []; head = blank; right = t.head :: t.right }
+  | [] -> { left = []; head = blank; right = t.head :: t.right }
 
 let move_right ~(blank:char) (t : tape) : tape =
   match t.right with
   | x :: xs -> { left = t.head :: t.left; head = x; right = xs }
-  | []      -> { left = t.head :: t.left; head = blank; right = [] }
+  | [] -> { left = t.head :: t.left; head = blank; right = [] }
 
 let write (c:char) (t:tape) : tape = { t with head = c }
 
@@ -108,7 +108,7 @@ let print_stats (st : stats) =
   printf "writes (changed) : %d\n" st.writes_changed;
   (match st.final_state with
    | Some s -> printf "final state      : %s\n" s
-   | None   -> ());
+   | None -> ());
   printf "state visits     : {";
   let first = ref true in
   List.iter (fun (k,v) ->
@@ -287,7 +287,7 @@ let run_with_stats
                 let tape' = write tr.write cfg.tape in
                 let tape'', head_pos', moves_l', moves_r' =
                   match tr.action with
-                  | Left  -> (move_left ~blank:machine.blank tape', head_pos - 1, moves_l + 1, moves_r)
+                  | Left -> (move_left ~blank:machine.blank tape', head_pos - 1, moves_l + 1, moves_r)
                   | Right -> (move_right ~blank:machine.blank tape', head_pos + 1, moves_l, moves_r + 1)
                 in
                 let min_pos' = if head_pos' < min_pos then head_pos' else min_pos in

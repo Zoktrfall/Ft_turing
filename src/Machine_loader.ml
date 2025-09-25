@@ -186,12 +186,12 @@ let load ~json_path =
                         Error [TransitionMalformed ("state " ^ st ^ " (missing " ^ k ^ ")")]
                   in
 
-                  let* read_js     = get "read" in
+                  let* read_js = get "read" in
                   let* to_state_js = get "to_state" in
-                  let* write_js    = get "write" in
-                  let* action_js   = get "action" in
+                  let* write_js = get "write" in
+                  let* action_js = get "action" in
 
-                  let* read_s  = J.as_string "read" read_js in
+                  let* read_s = J.as_string "read" read_js in
                   let* write_s = J.as_string "write" write_js in
 
                   let* read_c =

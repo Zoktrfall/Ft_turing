@@ -24,9 +24,9 @@ let () =
 
                let print_reason = function
                  | Runner.Final_state _ -> ()
-                 | Runner.Blocked_no_state s    -> Machine_printer.print_blocked_no_state s
+                 | Runner.Blocked_no_state s -> Machine_printer.print_blocked_no_state s
                  | Runner.Blocked_no_rule (s,c) -> Machine_printer.print_blocked_no_rule s c
-                 | Runner.Step_limit_reached n  -> Machine_printer.print_step_limit n
+                 | Runner.Step_limit_reached n -> Machine_printer.print_step_limit n
                in
 
                if stats then begin
