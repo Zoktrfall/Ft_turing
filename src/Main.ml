@@ -19,7 +19,7 @@ let () =
            | Ok () ->
                Machine_printer.print_machine_info machine;
 
-               let max_steps = 100 in
+               let max_steps = 500 in
                let trace = not no_trace in
 
                let print_reason = function

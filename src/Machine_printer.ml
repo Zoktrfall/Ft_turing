@@ -46,14 +46,21 @@ let last_n n xs =
   if len <= n then xs else drop (len - n) xs
 
 let render_tape ~blank ~left ~head ~right =
-  let pad_right = 13 in
+  let show_left_end = (left = [] && head = blank) in
+  let head_render = if show_left_end then '|' else head in
+
+  let default_pad_right = 13 in
+  let pad_right =
+    if show_left_end then 3
+    else default_pad_right
+  in
 
   let curr_inner_len =
     List.length left + 3 + List.length right + pad_right
   in
   let target_inner_len =
     match !_fixed_inner_width with
-    | Some w -> w
+    | Some w -> max w curr_inner_len
     | None ->
         _fixed_inner_width := Some curr_inner_len;
         curr_inner_len
@@ -75,7 +82,7 @@ let render_tape ~blank ~left ~head ~right =
   add_left_rev_to_buf left_slice;
 
   Buffer.add_char buf '<';
-  Buffer.add_char buf head;
+  Buffer.add_char buf head_render; 
   Buffer.add_char buf '>';
 
   List.iter (Buffer.add_char buf) right_slice;

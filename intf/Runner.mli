@@ -23,7 +23,7 @@ val run : ?max_steps:int -> machine:Machine.t -> input:string -> (config, halt_r
 
 (* We Seperate the Bonus part *)
 type stats = {
-  n int;
+  n : int;
   steps : int;
   min_pos : int;
   max_pos : int;
